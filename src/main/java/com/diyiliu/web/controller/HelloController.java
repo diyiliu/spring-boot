@@ -1,4 +1,4 @@
-package com.diyiliu.controller;
+package com.diyiliu.web.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
