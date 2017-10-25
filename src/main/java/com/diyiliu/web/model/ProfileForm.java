@@ -1,7 +1,10 @@
 package com.diyiliu.web.model;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +16,17 @@ import java.util.List;
  */
 public class ProfileForm {
 
+    @Size(min = 2, message = "长度最小为2")
     private String twitterHandle;
+
+    @Email
+    @NotEmpty
     private String email;
+
+    @NotNull
     private LocalDate birthDate;
+
+    @NotNull
     private List<String> tastes = new ArrayList<>();
 
     public String getTwitterHandle() {
