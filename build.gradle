@@ -17,6 +17,7 @@ ext{
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBootVersion}"
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: "${springBootVersion}"
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: "${springBootVersion}"
 
     compile group: 'org.webjars', name: 'jquery', version: '2.1.4'
     compile group: 'org.webjars', name: 'materializecss', version: '0.96.0'

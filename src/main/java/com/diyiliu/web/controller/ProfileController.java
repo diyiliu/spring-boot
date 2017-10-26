@@ -1,13 +1,16 @@
 package com.diyiliu.web.controller;
 
+import com.diyiliu.support.config.UserProfileSession;
 import com.diyiliu.support.format.CNLocalDateFormatter;
 import com.diyiliu.web.model.ProfileForm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Locale;
@@ -21,6 +24,21 @@ import java.util.Locale;
 @Controller
 public class ProfileController {
 
+    @Autowired
+    private UserProfileSession userProfileSession;
+
+    @ModelAttribute
+    public ProfileForm getProfileForm() {
+        return userProfileSession.toForm();
+    }
+
+    /**
+     * 必须添加profileForm 参数，
+     * 否则跳转页面会报错
+     *
+     * @param profileForm
+     * @return
+     */
     @RequestMapping("/profile")
     public String displayProfile(ProfileForm profileForm) {
 
@@ -34,6 +52,7 @@ public class ProfileController {
         }
 
         System.out.println("save ok: " + profileForm);
+        userProfileSession.saveForm(profileForm);
 
         return "redirect:/profile";
     }
