@@ -3,24 +3,22 @@ package com.diyiliu.web.controller;
 import com.diyiliu.support.config.PictureUploadProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.util.WebUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
 
 /**
@@ -30,6 +28,7 @@ import java.util.Locale;
  */
 
 @Controller
+@SessionAttributes("picturePath")
 public class PictureUploadController {
     // public static final Resource PICTURES_DIR = new FileSystemResource("./picture");
 
@@ -44,6 +43,11 @@ public class PictureUploadController {
         this.messageSource = messageSource;
     }
 
+    @ModelAttribute("picturePath")
+    public Resource picturePath() {
+        return anonymousPicture;
+    }
+
     @RequestMapping("upload")
     public String uploadPage() {
 
@@ -51,14 +55,16 @@ public class PictureUploadController {
     }
 
     @RequestMapping(value = "upload", method = RequestMethod.POST)
-    public String onUpload(MultipartFile file, RedirectAttributes redirectAttributes) throws IOException {
+    public String onUpload(MultipartFile file, Model model,
+                           RedirectAttributes redirectAttributes) throws IOException {
         if (file.isEmpty() || !isImage(file)) {
             redirectAttributes.addFlashAttribute("error", "Incorrect file. Please upload a picture.");
 
             return "redirect:/upload";
         }
 
-        copyFileToPictures(file);
+        Resource picturePath = copyFileToPictures(file);
+        model.addAttribute("picturePath", picturePath);
 
         return "profile/uploadPage";
     }
@@ -83,20 +89,28 @@ public class PictureUploadController {
         return new FileSystemResource(tempFile);
     }
 
-    @RequestMapping(value = "uploadedPicture")
+    /*@RequestMapping(value = "uploadedPicture")
     public void getUploadedPicture(HttpServletResponse response) throws IOException {
-        /*
+        *//*
         ClassPathResource classPathResource = new ClassPathResource("/image/user.jpg");
         response.setHeader("Content-Type", URLConnection.guessContentTypeFromName(classPathResource.getFilename()));
         FileCopyUtils.copy(classPathResource.getInputStream(), response.getOutputStream());
-        */
+        *//*
 
         response.setHeader("Content-Type", URLConnection.guessContentTypeFromName(anonymousPicture.getFilename()));
         FileCopyUtils.copy(anonymousPicture.getInputStream(), response.getOutputStream());
+    }*/
+
+    @RequestMapping(value = "uploadedPicture")
+    public void getUploadedPicture(HttpServletResponse response,
+                                   @ModelAttribute("picturePath") Resource picturePath) throws IOException {
+        response.setHeader("Content-Type", URLConnection.guessContentTypeFromName(picturePath.getFilename()));
+        FileCopyUtils.copy(picturePath.getInputStream(), response.getOutputStream());
     }
 
     /**
      * 异常错误跳转
+     *
      * @return
      */
     /*@RequestMapping("uploadError")
@@ -105,7 +119,6 @@ public class PictureUploadController {
         modelAndView.addObject("error", request.getAttribute(WebUtils.ERROR_MESSAGE_ATTRIBUTE));
         return modelAndView;
     }*/
-
     @RequestMapping("uploadError")
     public ModelAndView onUploadError(Locale locale) {
         ModelAndView modelAndView = new ModelAndView("profile/uploadPage");
@@ -116,6 +129,7 @@ public class PictureUploadController {
 
     /**
      * 异常处理类
+     *
      * @param locale
      * @return
      */
