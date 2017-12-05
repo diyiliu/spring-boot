@@ -1,7 +1,6 @@
 package com.diyiliu.support.config;
 
 import com.diyiliu.support.format.CNLocalDateFormatter;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ErrorPage;
@@ -24,7 +23,6 @@ import java.time.LocalDate;
  */
 
 @Configuration
-@SpringBootApplication
 @EnableConfigurationProperties({PictureUploadProperties.class})
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
